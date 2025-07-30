@@ -10,7 +10,6 @@ __kernel void update_fields(__global float* temperature,
     float t = temperature[idx];
     float p = pressure[idx];
 
-    float dt = 0.1f;
     temperature[idx] = t + 0.01f * (p - 100000.0f) * dt;
     pressure[idx] = p - 0.02f * (t - 290.0f) * dt;
 }
