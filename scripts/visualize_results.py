@@ -15,6 +15,8 @@ def main() -> None:
     args = parser.parse_args()
 
     data = np.load(args.file)
+    if data.ndim < 3:
+        raise ValueError(f"Input file {args.file} must contain a 3D array, but got an array with {data.ndim} dimensions.")
     level = min(args.level, data.shape[2] - 1)
     field = data[:, :, level]
     plt.imshow(field.T, origin="lower", cmap="viridis")
