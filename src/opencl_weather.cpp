@@ -13,8 +13,16 @@ bool OpenCLWeatherSim::initialize() {
 
     d_temperature = clCreateBuffer(context, CL_MEM_READ_WRITE,
                                    sizeof(float)*cell_count, nullptr, nullptr);
+    if (d_temperature == nullptr) {
+        std::cerr << "Error: Failed to allocate GPU buffer for temperature." << std::endl;
+        return false;
+    }
     d_pressure = clCreateBuffer(context, CL_MEM_READ_WRITE,
                                  sizeof(float)*cell_count, nullptr, nullptr);
+    if (d_pressure == nullptr) {
+        std::cerr << "Error: Failed to allocate GPU buffer for pressure." << std::endl;
+        return false;
+    }
     upload();
 
     std::ifstream file("kernels/weather_kernels.cl");
