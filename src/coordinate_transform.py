@@ -12,7 +12,7 @@ def wgs84_to_utm(lat: float, lon: float) -> Tuple[float, float, int, str]:
     zone = int((lon + 180) / 6) + 1
     hemisphere = 'north' if lat >= 0 else 'south'
     epsg = 32600 + zone if hemisphere == 'north' else 32700 + zone
-    transformer = Transformer.from_crs("EPSG:4326", f"EPSG:{epsg}", always_xy=True)
+    transformer = get_transformer(epsg)
     easting, northing = transformer.transform(lon, lat)
     return easting, northing, zone, hemisphere
 
