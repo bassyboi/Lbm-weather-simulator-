@@ -43,9 +43,10 @@ class LBMCore:
 
         # equilibrium distribution
         cu = np.einsum('ia,axy->ixy', C, self.u)
+        u_sq = (self.u**2).sum(axis=0)  # Compute magnitude squared of velocity
         feq = np.empty_like(self.f)
         for i in range(19):
-            feq[i] = self.rho * W[i] * (1 + 3*cu[i] + 4.5*cu[i]**2 - 1.5*(self.u**2).sum(axis=0))
+            feq[i] = self.rho * W[i] * (1 + 3*cu[i] + 4.5*cu[i]**2 - 1.5*u_sq)
         self.f += self.omega * (feq - self.f)
 
         # streaming step with periodic boundaries
