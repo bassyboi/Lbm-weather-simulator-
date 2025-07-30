@@ -27,12 +27,17 @@ def main() -> None:
     args = parser.parse_args()
 
     weather = fetch_weather(args.lat, args.lon)
+    # Extract relevant weather parameters (e.g., temperature, wind speed)
+    temperature = weather.get("temperature", 300)  # Default to 300K if not provided
+    wind_speed = weather.get("wind_speed", 0)  # Default to 0 m/s if not provided
+
     # compute grid size
     length_m = args.domain_size * 1000 * 2
     n = max(1, length_m // args.resolution)
     shape = (int(n), int(n), 10)  # thin vertical extent for toy model
 
-    lbm = LBMCore(shape)
+    # Initialize LBMCore with weather-influenced initial conditions
+    lbm = LBMCore(shape, initial_temperature=temperature, initial_wind_speed=wind_speed)
     lbm.run(args.duration)
 
     args.output.mkdir(parents=True, exist_ok=True)
