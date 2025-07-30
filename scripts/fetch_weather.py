@@ -35,7 +35,6 @@ def build_params(lat: float, lon: float) -> dict:
         "latitude": lat,
         "longitude": lon,
         "hourly": ",".join(hourly),
-        "pressure_level": ",".join(str(l) for l in PRESSURE_LEVELS),
     })
     return params
 
