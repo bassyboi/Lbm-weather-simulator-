@@ -18,6 +18,10 @@ bool OpenCLWeatherSim::initialize() {
     upload();
 
     std::ifstream file("kernels/weather_kernels.cl");
+    if (!file.is_open()) {
+        std::cerr << "Error: Failed to open kernel file 'kernels/weather_kernels.cl'" << std::endl;
+        return false;
+    }
     std::string source((std::istreambuf_iterator<char>(file)),
                        std::istreambuf_iterator<char>());
     if (!build_kernels(source)) return false;
