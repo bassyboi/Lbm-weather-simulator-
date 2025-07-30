@@ -35,8 +35,11 @@ bool OpenCLWeatherSim::init_opencl() {
         std::cerr << "Error: Failed to get OpenCL platform IDs. Error code: " << err << std::endl;
         return false;
     }
-    clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, &num);
-    if (!num) return false;
+    cl_int err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, &num);
+    if (err != CL_SUCCESS || !num) {
+        std::cerr << "Error: Failed to get device IDs. OpenCL error code: " << err << std::endl;
+        return false;
+    }
     context = clCreateContext(nullptr, 1, &device, nullptr, nullptr, nullptr);
     queue = clCreateCommandQueueWithProperties(context, device, nullptr, nullptr);
     return true;
