@@ -38,7 +38,8 @@ class LBMCore:
     def collide_and_stream(self):
         # compute macroscopic fields
         self.rho = self.f.sum(axis=0)
-        self.u = np.tensordot(C.T, self.f, axes=(1,0)) / self.rho
+        EPSILON = 1e-10  # Small constant to prevent division by zero
+        self.u = np.tensordot(C.T, self.f, axes=(1,0)) / (self.rho + EPSILON)
 
         # equilibrium distribution
         cu = np.einsum('ia,axy->ixy', C, self.u)
