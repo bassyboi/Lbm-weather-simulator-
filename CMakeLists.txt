@@ -25,6 +25,7 @@ endif()
 
 # Find required packages
 find_package(OpenCL REQUIRED)
+add_definitions(-DHAVE_OPENCL)
 
 # Find optional packages
 find_package(PkgConfig)
@@ -64,6 +65,7 @@ set(COMMON_SOURCES
   src/terrain_manager.cpp
   src/boundary_conditions.cpp
   src/visualization.cpp
+  src/opencl_weather.cpp
 )
 
 # Header files
@@ -75,6 +77,7 @@ set(HEADERS
   include/boundary_conditions.hpp
   include/visualization.hpp
   include/common.hpp
+  include/opencl_weather.hpp
 )
 
 # Main executable
@@ -108,11 +111,15 @@ target_link_libraries(tornado_sim ${OpenCL_LIBRARIES} Threads::Threads)
 add_executable(weather_forecast src/forecast_main.cpp ${COMMON_SOURCES})
 target_link_libraries(weather_forecast ${OpenCL_LIBRARIES} Threads::Threads)
 
+# OpenCL accelerated weather simulation example
+add_executable(opencl_sim src/opencl_main.cpp ${COMMON_SOURCES})
+target_link_libraries(opencl_sim ${OpenCL_LIBRARIES} Threads::Threads)
+
 # Copy OpenCL kernels to build directory
 file(COPY ${CMAKE_SOURCE_DIR}/kernels/ DESTINATION ${CMAKE_BINARY_DIR}/kernels/)
 
 # Installation
-install(TARGETS atmospheric_lbm tornado_sim weather_forecast
+install(TARGETS atmospheric_lbm tornado_sim weather_forecast opencl_sim
         RUNTIME DESTINATION bin)
 
 install(DIRECTORY kernels/ DESTINATION share/atmospheric_lbm/kernels/)

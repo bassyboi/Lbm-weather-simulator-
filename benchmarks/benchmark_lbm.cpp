@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main() {
-    AtmosphericLBM lbm;
+    AtmosphericLBM lbm(false);
     auto start = std::chrono::high_resolution_clock::now();
     lbm.run();
     auto end = std::chrono::high_resolution_clock::now();
