@@ -54,9 +54,13 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
+    - name: Update package lists
+      if: runner.os == 'Linux'
+      run: sudo apt-get update
+
     - name: Install dependencies
       if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install -y ocl-icd-opencl-dev opencl-headers
+      run: sudo apt-get install -y ocl-icd-opencl-dev opencl-headers
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
