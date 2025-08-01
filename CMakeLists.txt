@@ -23,8 +23,16 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   set(CMAKE_CXX_FLAGS_DEBUG "/Od /Zi")
 endif()
 
-# Find required packages
-find_package(OpenCL REQUIRED)
+# Optionally enable OpenCL
+option(ENABLE_OPENCL "Build with OpenCL support" ON)
+if(ENABLE_OPENCL)
+  find_package(OpenCL QUIET)
+  if(OpenCL_FOUND)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_OPENCL)
+  else()
+    message(WARNING "OpenCL not found - continuing without GPU acceleration")
+  endif()
+endif()
 
 # Find optional packages
 find_package(PkgConfig)
@@ -54,7 +62,9 @@ endif()
 
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
-include_directories(${OpenCL_INCLUDE_DIRS})
+if(OpenCL_FOUND)
+  include_directories(${OpenCL_INCLUDE_DIRS})
+endif()
 
 # Source files shared by all executables
 set(COMMON_SOURCES
@@ -81,10 +91,10 @@ set(HEADERS
 add_executable(atmospheric_lbm src/main.cpp ${COMMON_SOURCES} ${HEADERS})
 
 # Link libraries
-target_link_libraries(atmospheric_lbm
-  ${OpenCL_LIBRARIES}
-  Threads::Threads
-)
+target_link_libraries(atmospheric_lbm Threads::Threads)
+if(OpenCL_FOUND)
+  target_link_libraries(atmospheric_lbm ${OpenCL_LIBRARIES})
+endif()
 
 # Optional library linking
 if(NETCDF_FOUND)
@@ -103,13 +113,21 @@ endif()
 
 # Additional executables for different simulation modes
 add_executable(tornado_sim src/tornado_main.cpp ${COMMON_SOURCES})
-target_link_libraries(tornado_sim ${OpenCL_LIBRARIES} Threads::Threads)
+target_link_libraries(tornado_sim Threads::Threads)
+if(OpenCL_FOUND)
+  target_link_libraries(tornado_sim ${OpenCL_LIBRARIES})
+endif()
 
 add_executable(weather_forecast src/forecast_main.cpp ${COMMON_SOURCES})
-target_link_libraries(weather_forecast ${OpenCL_LIBRARIES} Threads::Threads)
+target_link_libraries(weather_forecast Threads::Threads)
+if(OpenCL_FOUND)
+  target_link_libraries(weather_forecast ${OpenCL_LIBRARIES})
+endif()
 
 # Copy OpenCL kernels to build directory
-file(COPY ${CMAKE_SOURCE_DIR}/kernels/ DESTINATION ${CMAKE_BINARY_DIR}/kernels/)
+if(OpenCL_FOUND)
+  file(COPY ${CMAKE_SOURCE_DIR}/kernels/ DESTINATION ${CMAKE_BINARY_DIR}/kernels/)
+endif()
 
 # Installation
 install(TARGETS atmospheric_lbm tornado_sim weather_forecast
@@ -123,16 +141,22 @@ install(FILES README.md LICENSE DESTINATION share/atmospheric_lbm/)
 enable_testing()
 
 add_executable(test_lbm tests/test_lbm.cpp ${COMMON_SOURCES})
-target_link_libraries(test_lbm ${OpenCL_LIBRARIES})
+if(OpenCL_FOUND)
+  target_link_libraries(test_lbm ${OpenCL_LIBRARIES})
+endif()
 add_test(NAME LBMTest COMMAND test_lbm)
 
 add_executable(test_tornado tests/test_tornado.cpp ${COMMON_SOURCES})
-target_link_libraries(test_tornado ${OpenCL_LIBRARIES})
+if(OpenCL_FOUND)
+  target_link_libraries(test_tornado ${OpenCL_LIBRARIES})
+endif()
 add_test(NAME TornadoTest COMMAND test_tornado)
 
 # Benchmarks
 add_executable(benchmark_lbm benchmarks/benchmark_lbm.cpp ${COMMON_SOURCES})
-target_link_libraries(benchmark_lbm ${OpenCL_LIBRARIES})
+if(OpenCL_FOUND)
+  target_link_libraries(benchmark_lbm ${OpenCL_LIBRARIES})
+endif()
 
 # Documentation (requires Doxygen)
 find_package(Doxygen)
