@@ -125,7 +125,9 @@ if(OpenCL_FOUND)
 endif()
 
 # Copy OpenCL kernels to build directory
-file(COPY ${CMAKE_SOURCE_DIR}/kernels/ DESTINATION ${CMAKE_BINARY_DIR}/kernels/)
+if(OpenCL_FOUND)
+  file(COPY ${CMAKE_SOURCE_DIR}/kernels/ DESTINATION ${CMAKE_BINARY_DIR}/kernels/)
+endif()
 
 # Installation
 install(TARGETS atmospheric_lbm tornado_sim weather_forecast
